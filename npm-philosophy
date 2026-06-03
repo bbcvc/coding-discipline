@@ -1,0 +1,133 @@
+<coding-discipline name="公共范式优先" scope="js/ts: 前端 | 后端 | agent">
+
+  <spirit>
+    代码当为公共语言,而非私人独白。
+    AI 从零手搓 = 每次发明一套只有当下能懂的"私人语言",导致风格漂移、人类难维护。
+    本纪律不是"教条",而是一组"值得追求的理想"(ideals to reach for):
+    通过组合、统一接口与单一来源,让每份通用能力收敛到公共范式,
+    以共同体的语言对抗生成过程的熵增。
+    —— 你既是轮子的消费者,也是生态的公民。
+  </spirit>
+
+  <supreme-principle name="最高仲裁:当各约束冲突时,以此裁决">
+    Working is better than perfect.   (能用胜过完美)
+    Focus   is better than features.  (专注胜过功能堆砌)
+    Compatibility is better than purity. (兼容胜过纯粹)
+    Simplicity is better than anything.  (简单压倒一切)
+    <note>
+      任何下游规则与"简单性"冲突时,简单性优先。
+      这取代一切机械红线(如"N 行以内不许引库"):用品味裁决,而非数字。
+    </note>
+  </supreme-principle>
+
+  <core name="组合优于一切">
+    <composition>
+      首要追求不是"用了多少库",而是部件能否像管道般拼接。
+      偏好组合(composition),拒绝继承式扩展(extension)。
+    </composition>
+    <universal-interface>
+      优先选择定义"统一契约/可组合接口"的能力,其收敛力最强。
+      Node 时代的 universal interface 已从 Stream 延伸到"契约层"——
+      zod 之所以贯通前端/后端/agent,正因它是跨端的统一接口,而非仅因"成熟"。
+    </universal-interface>
+    <producer-consumer-unity>
+      消费依赖与封装模块是同一种精神的两种形态,无高下之分。
+      今天为自己快写的小而专注的模块,明天即可成为他人的依赖。
+      → 因此"自写通用模块"不是退路,而是这套哲学的正常形态。
+    </producer-consumer-unity>
+  </core>
+
+  <mindset name="分解:业务是问题,通用是手段">
+    需求 100% 来自业务,但不可整块实现。
+    先把业务需求分解为若干"实现手段",逐一判定归类。
+    <example>
+      需求:"流畅展示十万条订单,支持筛选与实时刷新"
+      ├─ 长列表渲染   → 通用手段 → @tanstack/virtual
+      ├─ 请求/缓存/刷新 → 通用手段 → @tanstack/query
+      ├─ 筛选校验      → 通用手段 → zod
+      └─ 订单领域规则   → 真业务   → 自写
+    </example>
+  </mindset>
+
+  <decision-rule name="对每个'手段'的落位">
+    <option name="用成熟库">
+      通用能力 + 有成熟库 → 采用,并遵循其惯用法。默认选择。
+    </option>
+    <option name="快写内部模块">
+      通用能力 + 无合适库 → 快速封装为单一职责、接口清晰的小模块。
+      "Write modules quickly, to meet your needs, with just a few tests."
+      同一能力再次出现必须复用,严禁重写。将来可 publish 成内部包。
+    </option>
+    <option name="业务自写">
+      真·领域逻辑 → 自写,遵循项目既有模式,与通用层解耦。
+    </option>
+    <burden-of-proof>
+      举证责任倒置:用既有范式(库或已有内部模块)是默认,无需论证;
+      "重新发明一个通用能力"才需说明理由。
+    </burden-of-proof>
+  </decision-rule>
+
+  <selection-criteria name="一个库是否够格">
+    <criterion weight="最高">提供统一契约/可组合接口(能与其它部件拼接)。</criterion>
+    <criterion>通用性:解决大家都要的问题,而非你的业务。</criterion>
+    <criterion>易错性:手搓易出 bug(缓存、并发、时区、安全、滚动计算)。</criterion>
+    <criterion>成熟度:维护活跃、社区广、文档全(用于排除供应链/体积风险)。</criterion>
+  </selection-criteria>
+
+  <single-source name="通用能力单一来源(DRY 深层版)">
+    系统中每份"知识/能力"只有唯一、权威的表示。
+    能收敛到库就用库;不能就收敛到内部模块。
+    严禁在多处即兴内联、重复发明同一能力。
+  </single-source>
+
+  <resolve-docs name="用库前,先接上 package.json → 惯用法 这条断线">
+    package.json 只声明"用了什么 + 什么版本",并不指向"该怎么用";
+    若放任模型凭记忆补全,必然过时 / 幻觉 / 版本错配,
+    导致"表面用了库,实则乱用"——这是另一种混乱。
+    故采用任何库之前,必须先获取"本项目所装版本"的权威用法:
+    <source priority="1">
+      Context7 等文档 MCP:实时拉取、与版本对齐 —— 首选。
+    </source>
+    <source priority="2">
+      库文档站的 llms.txt / llms-full.txt(若存在):AI 友好的官方内容索引。
+    </source>
+    <source priority="3">
+      本地 node_modules 的 .d.ts 类型定义与 README:永远可用、版本最准,
+      类型签名是"不会骗人的惯用法真相"。
+    </source>
+    <rule>版本契约以 package.json 为唯一事实来源,所取文档须与之对齐。</rule>
+    <rule>用法知识的权威来源是"锁定版本的文档",绝非模型记忆。</rule>
+  </resolve-docs>
+
+  <usage-constraint name="用库 ≠ 乱用库">
+    依据 resolve-docs 取得的权威用法,遵循库的惯用法组织代码,否则约束失效。
+    <anti-pattern>引入 @tanstack/query 仍在 useEffect 里手动 fetch。</anti-pattern>
+    <anti-pattern>引入 react-hook-form 仍用受控 state 自管表单。</anti-pattern>
+  </usage-constraint>
+
+  <arsenal name="分领域弹药库(非穷举,可被'简单性'与'统一接口'覆盖)">
+    <frontend>
+      请求缓存=@tanstack/query | 虚拟列表=@tanstack/virtual |
+      表单=react-hook-form+zod | 状态=zustand/jotai |
+      组件=shadcn/antd | 拖拽=dnd-kit | 动画=framer-motion
+    </frontend>
+    <backend>
+      框架=Hono/Fastify | 校验=zod | ORM=Drizzle/Prisma |
+      鉴权=better-auth/Lucia | 队列=BullMQ | 日期=date-fns/Temporal
+    </backend>
+    <agent>
+      LLM=@anthropic-ai/sdk / ai(vercel) | 编排=Agent SDK/LangGraph |
+      结构化输出=zod+tool use | 工具入参契约=zod
+    </agent>
+    <meta-rule>优先选定义契约、可跨端复用的库(zod 贯通三端即典范)。</meta-rule>
+  </arsenal>
+
+  <anti-patterns name="反模式提示(非铁律,最终由'简单性'裁决)">
+    <item>未分解就整块手写混合通用+业务的大文件。</item>
+    <item>为通用能力即兴造轮子,而不先查成熟库。</item>
+    <item>引入库却不先 resolve-docs、凭记忆写过时/幻觉 API。</item>
+    <item>引入库却不遵循其惯用法。</item>
+    <item>把"自写通用模块"当作不得已的兜底,而非正常贡献。</item>
+  </anti-patterns>
+
+</coding-discipline>
